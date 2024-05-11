@@ -17,10 +17,19 @@
 </head>
 <body>
   <div class="container">
+    <div class="container mt-5 justify-content-center align-items-center">
+        <div class="text-center">
+
+            <div class="text-center">
+              <select id="select-box-1" class="form-select"></select>
+                <select id="select-box-2" class="form-select"></select>
+            </div>
+        </div>
+    </div>
     <div class="word-container">
       <h3 class="text-center" id="word"></h3>
       <div class="text-center">
-        <button class="btn btn-info" onclick="displayRandomWord()">מילה חדשה</button>
+        <button class="btn btn-info" onclick="displayRandomWord()">חדש אקראי</button>
         <button class="btn btn-success" onclick="showMeaning()">תשובה</button>
         <button class="btn btn-warning" onclick="showSynonym()">שורש</button>
 
@@ -156,19 +165,53 @@
                'פ':'ף'
               }
 
+    function populateSelectBox(selectBoxId, list) {
+    const selectBox = document.getElementById(selectBoxId);
+    // Clear existing options
+    selectBox.innerHTML = "";
+    // Populate options
+    list.forEach(option => {
+        const optionElement = document.createElement("option");
+        optionElement.textContent = option;
+        selectBox.appendChild(optionElement);
+    });
+}
+
+    // Populate select boxes
+    populateSelectBox("select-box-1", words.map(item => item.heb));
+    populateSelectBox("select-box-2", Object.keys(bodys));
+
+
+    function chooseRandomValue(selectBoxId, randomIndex) {
+    const selectBox = document.getElementById(selectBoxId);
+    selectBox.selectedIndex = randomIndex;
+    }
+
     // Function to display a random word
     function displayRandomWord() {
+
+      
+      
       var randomIndex = Math.floor(Math.random() * words.length);
+      chooseRandomValue("select-box-1", randomIndex);
       const randomWord = words[randomIndex];
       const keys = Object.keys(bodys);
       randomIndex = Math.floor(Math.random() * keys.length);
-      const randomBody = keys[randomIndex];
-      document.getElementById("word").textContent = randomBody + ' - '+ randomWord.heb;
-      document.getElementById("meaning-box").style.display = "none";
-      document.getElementById("synonym-box").style.display = "none";
-      document.getElementById("meaning").textContent = joinRoot(randomWord, randomBody);
-      document.getElementById("synonym").textContent = randomWord.arb.join('')
+      chooseRandomValue("select-box-2", randomIndex);
 
+      displayWord();
+    }
+
+    function displayWord(){
+        hebValue = document.getElementById("select-box-1").value;
+        word = words.find(item => item.heb === hebValue);
+        body = document.getElementById("select-box-2").value;
+
+        document.getElementById("word").textContent = body + ' - '+ word.heb;
+        document.getElementById("meaning-box").style.display = "none";
+        document.getElementById("synonym-box").style.display = "none";
+        document.getElementById("meaning").textContent = joinRoot(word, body);
+        document.getElementById("synonym").textContent = word.arb.join('')
     }
 
     function mergeStrings(s1, s2) {
@@ -222,6 +265,8 @@
 
     // Display a random word when the page loads
     window.onload = displayRandomWord;
+    document.getElementById('select-box-1').addEventListener('change',displayWord)
+    document.getElementById('select-box-2').addEventListener('change',displayWord)
   </script>
 </body>
 </html>
